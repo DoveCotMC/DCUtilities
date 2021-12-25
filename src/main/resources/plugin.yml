@@ -1,0 +1,4 @@
+name: DoveCotMCUtils
+main: com.dovecot.dcmc_utils.DoveCotMCUtilities
+version: "1.0.0"
+author: Tapio
