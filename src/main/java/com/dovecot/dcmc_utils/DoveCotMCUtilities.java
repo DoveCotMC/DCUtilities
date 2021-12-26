@@ -2,8 +2,10 @@ package com.dovecot.dcmc_utils;
 
 import com.dovecot.dcmc_utils.config.DCUConfig;
 import com.dovecot.dcmc_utils.utils.CfgHandler;
+import com.dovecot.dcmc_utils.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 public class DoveCotMCUtilities extends JavaPlugin implements Listener {
@@ -35,13 +38,27 @@ public class DoveCotMCUtilities extends JavaPlugin implements Listener {
         getLogger().info(ChatColor.RED + "Disabled " + this.getName());
     }
 
-    //进服通知
+    //进服通知 和 防窒息
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event){
+        final Player player = event.getPlayer();
+        final Block headIn = player.getEyeLocation().getBlock();
         if(config.getBoolean(DCUConfig.PLAYER_JOIN_TIP)){
-            final Player player = event.getPlayer();
             final String messageToSend = CfgHandler.getStringOrEmpty(config, DCUConfig.PLAYER_JOIN_TIP_CONTENT);
             player.sendMessage(messageToSend);
+        }
+        if(!(headIn.isPassable() || headIn.isLiquid())){
+            if(config.getBoolean(DCUConfig.INFORM_PLAYER_OF_THE_STUCK_LOCATION)){
+                final String world = player.getWorld().getName();
+                final String location = StringUtils.locationToString(player.getLocation());
+                player.sendMessage(MessageFormat.format(CfgHandler.getStringOrEmpty(config, DCUConfig.PLAYER_STUCK_LOCATION_NOTIFY_CONTENT),world,location));
+            }
+            if(config.getBoolean(DCUConfig.CHECK_AND_PREVENT_PLAYER_STUCK)){
+                player.teleport(player.getWorld().getSpawnLocation());
+                if(config.getBoolean(DCUConfig.PLAYER_STUCK_RELIEF_NOTIFY)){
+                    player.sendMessage(CfgHandler.getStringOrEmpty(config, DCUConfig.PLAYER_STUCK_RELIEF_NOTIFY_CONTENT));
+                }
+            }
         }
     }
 
