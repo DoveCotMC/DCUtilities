@@ -111,7 +111,7 @@ public class PlayerInteract {
                     if (blockToAnalyze == oM){
                         b += 9;
                     }else if(blockToAnalyze == Material.BEDROCK){
-                        b -= 500;
+                        b -= 5000;
                     }
                 }
             }
