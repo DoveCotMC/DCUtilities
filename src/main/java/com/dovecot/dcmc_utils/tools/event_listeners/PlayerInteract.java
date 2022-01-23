@@ -16,6 +16,9 @@ import org.bukkit.plugin.Plugin;
 
 import java.text.MessageFormat;
 
+import static com.dovecot.dcmc_utils.tools.player.InventoryHandler.getMaterialAmountInInv;
+import static com.dovecot.dcmc_utils.tools.player.InventoryHandler.tryRemoveStackInInv;
+
 public class PlayerInteract {
     public static void BeaconPlacement(Plugin plugin, FileConfiguration config, Player player, Block block, EquipmentSlot hand){
         if(!config.getBoolean(DCUConfig.BEACON_PLACEMENT)){
@@ -41,8 +44,8 @@ public class PlayerInteract {
         if(materials == null){
             return;
         }
-        final int invBlockAmount = materialInInv(materials[0], inv);
-        final int invItemAmount = materialInInv(materials[1], inv);
+        final int invBlockAmount = getMaterialAmountInInv(materials[0], inv);
+        final int invItemAmount = getMaterialAmountInInv(materials[1], inv);
         final int usableBlockAmount = analyzeUsableBlockAmount(world,materials[0],oL);
         final int total = 9 * invBlockAmount + invItemAmount + usableBlockAmount;
         if(usableBlockAmount >= 0){
@@ -57,16 +60,7 @@ public class PlayerInteract {
         }
     }
 
-    private static int materialInInv(Material item, PlayerInventory inv){
-        int m = 0;
-        for(int i = 0; i <= inv.getSize(); i++){
-            ItemStack stack = inv.getItem(i);
-            if(stack != null && stack.getType() == item){
-                m += stack.getAmount();
-            }
-        }
-        return m;
-    }
+
 
     private static Material[] findCorrespondingItems(ItemStack stack){
         final Material m1 = stack.getType();
@@ -107,7 +101,7 @@ public class PlayerInteract {
         for(int y = 1; y <= 4; y++){
             for (int x = -y; x <= y; x++){
                 for (int z = -y; z <= y; z++){
-                    Material blockToAnalyze = world.getBlockAt(getBlockByLocationWithOffsets(world, oL, x, -y, z)).getType();
+                    final Material blockToAnalyze = world.getBlockAt(getBlockByLocationWithOffsets(world, oL, x, -y, z)).getType();
                     if (blockToAnalyze == oM){
                         b += 9;
                     }else if(blockToAnalyze == Material.BEDROCK){
@@ -134,7 +128,7 @@ public class PlayerInteract {
                     if (!(world.getBlockAt(toRemove).getType() == materials[0])){
                         Bukkit.getScheduler().runTaskLater(plugin, () -> {
                             replaceBlockAndDropResources(world, toRemove, materials[0], oL);
-                            int itemToRemove = tryRemoveStackInInv(inv, materials[0], new int[]{0,1}) * 9;
+                            final int itemToRemove = tryRemoveStackInInv(inv, materials[0], new int[]{0,1}) * 9;
                             tryRemoveStackInInv(inv, materials[1], new int[]{0,itemToRemove});
                         },10L);
                     }
@@ -144,8 +138,8 @@ public class PlayerInteract {
     }
 
     private static void replaceBlockAndDropResources(World world, Location toRemove, Material toPlace, Location toDrop){
-        Material blockToRemove = world.getBlockAt(toRemove).getType();
-        ItemStack resource = blockToRemove.isSolid()? new ItemStack(blockToRemove): null;
+        final Material blockToRemove = world.getBlockAt(toRemove).getType();
+        final ItemStack resource = blockToRemove.isSolid()? new ItemStack(blockToRemove): null;
         world.getBlockAt(toRemove).setType(Material.AIR);
         world.getBlockAt(toRemove).setType(toPlace);
         if(resource != null) {
@@ -153,20 +147,4 @@ public class PlayerInteract {
         }
     }
 
-    private static int tryRemoveStackInInv(PlayerInventory inv, Material toRemove, int[] removeAttributes) {
-        int amountToRemove = removeAttributes[1];
-        int index = removeAttributes[0];
-        if(amountToRemove > 0 && index < inv.getSize()){
-            final ItemStack itemGot = inv.getItem(index);
-            if (itemGot != null && itemGot.getType() == toRemove) {
-                int amountGot = itemGot.getAmount();
-                itemGot.setAmount(Math.max(0, amountGot - amountToRemove));
-                amountToRemove = Math.max(0, amountToRemove - amountGot);
-            }
-            index++;
-            removeAttributes = new int[]{index, amountToRemove};
-            tryRemoveStackInInv(inv, toRemove, removeAttributes);
-        }
-        return amountToRemove;
-    }
 }

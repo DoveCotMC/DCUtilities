@@ -3,7 +3,6 @@ package com.dovecot.dcmc_utils.tools.event_listeners;
 import com.dovecot.dcmc_utils.config.DCUConfig;
 import com.dovecot.dcmc_utils.utils.CfgHandler;
 import com.dovecot.dcmc_utils.utils.StringUtils;
-import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -36,7 +35,7 @@ public class PlayerJoin {
 
     public static void setCreativeForOps(FileConfiguration config, Player player){
         if(config.getBoolean(DCUConfig.SET_OP_TO_CREATIVE) && player.isOp()){
-            player.setGameMode(GameMode.CREATIVE);
+            player.performCommand(MessageFormat.format("/gamemode creative {}",player.getName()));
         }
     }
 }

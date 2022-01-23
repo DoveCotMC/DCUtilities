@@ -23,12 +23,12 @@ import java.util.logging.Logger;
 
 public class DoveCotMCUtilities extends JavaPlugin implements Listener {
 
-    public static Logger LOGGER = Bukkit.getLogger();
-    public FileConfiguration config = this.getConfig();
+    public static final Logger LOGGER = Bukkit.getLogger();
+    public final FileConfiguration config = this.getConfig();
 
     @Override
     public void onEnable() {
-        getLogger().info(ChatColor.GREEN + "Enabled " + this.getName());
+        LOGGER.info(ChatColor.GREEN + "Enabled " + this.getName());
 
         DCUConfig.initialize(this);
 
