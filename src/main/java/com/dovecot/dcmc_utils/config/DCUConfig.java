@@ -23,7 +23,7 @@ public class DCUConfig {
     public static final String BEACON_PLACEMENT_INTERRUPTED_BY_BEDROCK = "beacon placement interrupted by bedrock notification content";
     public static final String BEACON_PLACEMENT_INSUFFICIENT_MATERIAL_CONTENT = "beacon placement material insufficient notification content";
 
-    public static void initialize(JavaPlugin plugin){
+    public static void initialize(JavaPlugin plugin) {
         FileConfiguration config = plugin.getConfig();
         config.addDefault(ANTI_LIGHTNING, true);
         config.addDefault(ANTI_LIGHTNING_NOTIFY, true);

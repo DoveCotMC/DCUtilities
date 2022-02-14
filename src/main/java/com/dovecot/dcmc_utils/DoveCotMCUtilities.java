@@ -8,11 +8,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
@@ -43,7 +46,7 @@ public class DoveCotMCUtilities extends JavaPlugin implements Listener {
 
     //进服通知 / 防窒息 / OP进服创造
     @EventHandler
-    public void onPlayerJoinEvent(PlayerJoinEvent event){
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final Block headIn = player.getEyeLocation().getBlock();
         PlayerJoin.sendMessageOnJoin(config, player);
@@ -53,28 +56,33 @@ public class DoveCotMCUtilities extends JavaPlugin implements Listener {
 
     //防雷电
     @EventHandler
-    public void onLightningStrikeEvent(LightningStrikeEvent event){
+    public void onLightningStrikeEvent(LightningStrikeEvent event) {
         LightningStrike.preventLightnings(event, config, LOGGER);
     }
 
     @EventHandler
-    public void onBlockExplodeEvent(BlockExplodeEvent event){
+    public void onBlockExplodeEvent(BlockExplodeEvent event) {
         event.setCancelled(config.getBoolean(DCUConfig.ANTI_BLOCK_EXPLOSION));
     }
 
     @EventHandler
-    public void onEntityExplodeEvent(EntityExplodeEvent event){
+    public void onEntityExplodeEvent(EntityExplodeEvent event) {
         event.setCancelled(config.getBoolean(DCUConfig.ANTI_ENTITY_EXPLOSION));
     }
 
     @EventHandler
-    public void onPlayerInteractEvent(PlayerInteractEvent event){
+    public void onPlayerInteractEvent(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final Block block = event.getClickedBlock();
         final EquipmentSlot hand = event.getHand();
-        if (block != null)
-        {
+        if (block != null) {
             PlayerInteract.BeaconPlacement(this, config, player, block, hand);
         }
+    }
+
+    @EventHandler
+    public void onEntitySpawnEvent(EntitySpawnEvent event) {
+        final Entity entity = event.getEntity();
+        event.setCancelled(entity instanceof Bat);
     }
 }
